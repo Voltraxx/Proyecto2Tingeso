@@ -1,0 +1,135 @@
+version: "3.8"
+
+services:
+  # NGINX load balancer for backend
+  nginx-backend:
+    image: nginx
+    container_name: prestabanco-nginx-backend-container
+    restart: always
+    ports:
+      - "8090:8090"  # Puerto de acceso para el balanceador de backend
+    volumes:
+      - ./nginx-backend.conf:/etc/nginx/nginx.conf
+    networks:
+      - backend-network
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+
+  # NGINX load balancer for frontend
+  nginx-frontend:
+    image: nginx
+    container_name: prestabanco-nginx-frontend-container
+    restart: always
+    ports:
+      - "8070:8070"
+    volumes:
+      - ./nginx-frontend.conf:/etc/nginx/nginx.conf
+    networks:
+      - frontend-network
+    depends_on:
+      - frontend1
+      - frontend2
+      - frontend3
+
+  #Postgres
+  postgres_bd:
+    container_name: prestabanco_postgres
+    image: postgres
+    deploy:
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - prestabanco_postgres_volume:/var/lib/postgresql/data
+    networks:
+      - backend-network
+    environment:
+      - DB_USERNAME=prestabanco
+      - DB_PASSWORD=postgres
+    ports:
+      - "5435:5432"
+
+  # Backend instances
+  backend1:
+    container_name: prestabanco-backend-container-1
+    image: juanpablocr3/prestabanco_backend
+    environment:
+      - DB_HOST=postgres_bd
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=1234
+    networks:
+      - backend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - postgres_bd
+  
+  backend2:
+    container_name: prestabanco-backend-container-2
+    image: juanpablocr3/prestabanco_backend
+    environment:
+      - DB_HOST=postgres_bd
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=1234
+    networks:
+      - backend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - postgres_bd
+  
+  backend3:
+    container_name: prestabanco-backend-container-3
+    image: juanpablocr3/prestabanco_backend
+    environment:
+      - DB_HOST=postgres_bd
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=1234
+    networks:
+      - backend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+    depends_on:
+      - postgres_bd
+      
+  # Frontend instances
+  frontend1:
+    container_name: prestabanco-frontend-container-1
+    image: juanpablocr3/prestabanco_frontend
+    networks:
+      - frontend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+    
+  frontend2:
+    container_name: prestabanco-frontend-container-2
+    image: juanpablocr3/prestabanco_frontend
+    networks:
+      - frontend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  frontend3:
+    container_name: prestabanco-frontend-container-3
+    image: juanpablocr3/prestabanco_frontend
+    networks:
+      - frontend-network
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  prestabanco_postgres_volume:
+
+networks:
+  frontend-network:
+  backend-network:

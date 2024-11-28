@@ -1,0 +1,26 @@
+pipeline{
+    agent any
+    stages{
+        stage("Build Frontend"){
+            steps{
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Voltraxx/Tingeso1_frontend']])
+                dir("prestabanco_Frontend"){
+                    bat "npm install"
+                    bat "npm run build"
+                }
+            }
+        }
+        stage("Build and Push Docker Image"){
+            steps{
+                dir("prestabanco_frontend"){
+                    script{
+                        withDockerRegistry(credentialsId: 'docker-credentials'){
+                            bat "docker build -t juanpablocr3/prestabanco_frontend ."
+                            bat "docker push juanpablocr3/prestabanco_frontend"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
