@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/Tingeso_2_Base/Tingeso1/Backend/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/config-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway-server/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservicio1/ms1/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservicio2/ms2/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservicio3/ms3/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservicio4/ms4/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservicio5/ms5/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/microservicio6/ms6/src/main/java" charset="UTF-8" />
+  </component>
+</project>
