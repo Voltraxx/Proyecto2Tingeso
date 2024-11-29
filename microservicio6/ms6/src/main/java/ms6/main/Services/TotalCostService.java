@@ -1,4 +1,7 @@
-/*package ms6.main.Services;
+package ms6.main.Services;
+
+import ms6.main.dtos.CreditRequestDTO;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,49 +9,37 @@ import java.util.Map;
 @Service
 public class TotalCostService {
 
-    @Autowired
-    private RestTemplate restTemplate;
-
-    // Función para el HU6 que es calcular los costos totales
-    public Map<String, Object> calculateTotalCost(Long creditRequestId, double seguroDesgravamenPorcentaje, double seguroIncendio, double comisionAdministracionPorcentaje) {
-        // Llamar al microservicio de Solicitudes para obtener los datos de la solicitud
-        String url = "http://credit-requests-service/api/credit-requests/" + creditRequestId;
-        CreditRequestDTO creditRequest = restTemplate.getForObject(url, CreditRequestDTO.class);
-
-        // Realizar los cálculos basados en los datos obtenidos
-        return performCostCalculation(creditRequest, seguroDesgravamenPorcentaje, seguroIncendio, comisionAdministracionPorcentaje);
-    }
-
-    private Map<String, Object> performCostCalculation(CreditRequestDTO creditRequest, double seguroDesgravamenPorcentaje, double seguroIncendio, double comisionAdministracionPorcentaje) {
+    public Map<String, Object> calculateTotalCost(CreditRequestDTO creditRequestDTO, double seguroDesgravamenPorcentaje, double seguroIncendio, double comisionAdministracionPorcentaje) {
         Map<String, Object> result = new HashMap<>();
 
-        double loanAmount = creditRequest.getLoanValue();
-        int termInMonths = creditRequest.getTerm() * 12;
+        // Paso 1: Cuota Mensual del Préstamo (ya calculada previamente)
+        double monthlyQuota = creditRequestDTO.getMonthlyQuota();
+        result.put("cuotaMensual", monthlyQuota);
 
-        // Seguros
+        // Paso 2: Calcular Seguros
+        double loanAmount = creditRequestDTO.getLoanValue();
+
+        // El seguro de desgravamen se calcula como porcentaje del valor del préstamo mensual
         double seguroDesgravamen = loanAmount * (seguroDesgravamenPorcentaje / 100.0);
+        // El seguro de incendio sigue siendo un valor fijo proporcionado por el frontend
         double totalSeguros = seguroDesgravamen + seguroIncendio;
 
-        // Comisión por administración
-        double comisionAdministracion = loanAmount * (comisionAdministracionPorcentaje / 100.0);
-
-        // Cálculo del costo mensual
-        double monthlyQuota = creditRequest.getMonthlyQuota();
-        double costoMensual = monthlyQuota + totalSeguros;
-
-        // Cálculo del costo total
-        double costoTotal = (costoMensual * termInMonths) + comisionAdministracion;
-
-        // Armar el resultado
-        result.put("cuotaMensual", monthlyQuota);
         result.put("seguroDesgravamen", seguroDesgravamen);
         result.put("seguroIncendio", seguroIncendio);
         result.put("totalSeguros", totalSeguros);
+
+        // Paso 3: Comisión por Administración como porcentaje del valor del préstamo
+        double comisionAdministracion = loanAmount * (comisionAdministracionPorcentaje / 100.0);
         result.put("comisionAdministracion", comisionAdministracion);
+
+        // Paso 4: Cálculo del Costo Total del Préstamo
+        int totalMonths = creditRequestDTO.getTerm() * 12;
+        double costoMensual = monthlyQuota + totalSeguros;
+        double costoTotal = (costoMensual * totalMonths) + comisionAdministracion;
+
         result.put("costoMensual", costoMensual);
         result.put("costoTotal", costoTotal);
 
         return result;
     }
 }
-*/

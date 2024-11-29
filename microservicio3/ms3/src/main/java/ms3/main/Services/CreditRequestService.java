@@ -1,5 +1,6 @@
 package ms3.main.Services;
 
+import ms3.main.Clients.TotalCostFeignClient;
 import ms3.main.Entities.CreditRequest;
 import ms3.main.Repositories.CreditRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class CreditRequestService {
 
     @Autowired
     CreditRequestRepository creditRequestRepository;
+
+    @Autowired
+    private TotalCostFeignClient totalCostFeignClient;
 
     // Función para crear la solicitud de crédito
     // Mapa para almacenar las condiciones de cada tipo de préstamo
@@ -179,5 +183,10 @@ public class CreditRequestService {
         } else {
             throw new IllegalArgumentException("Solicitud de crédito no encontrada con el ID proporcionado.");
         }
+    }
+
+    public Map<String, Object> calculateTotalCost(Map<String, Object> requestBody) {
+        // Llamar al microservicio de TotalCost usando FeignClient
+        return totalCostFeignClient.calculateTotalCost(requestBody);
     }
 }

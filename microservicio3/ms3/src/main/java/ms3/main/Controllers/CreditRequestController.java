@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -114,6 +115,32 @@ public class CreditRequestController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
+    }
+
+    @PostMapping("/{id}/calculateTotalCost")
+    public ResponseEntity<Map<String, Object>> calculateTotalCost(
+            @PathVariable Long id,
+            @RequestBody Map<String, Double> values) {
+
+        // Obtener la solicitud de crédito por ID
+        CreditRequest creditRequest = creditRequestService.getCreditRequestById(id);
+        if (creditRequest == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Preparar los datos para enviar al microservicio de TotalCost
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("loanValue", creditRequest.getLoanValue());
+        requestBody.put("monthlyQuota", creditRequest.getMonthlyQuota());
+        requestBody.put("term", creditRequest.getTerm());
+        requestBody.put("seguroDesgravamen", values.getOrDefault("seguroDesgravamen", 0.0));
+        requestBody.put("seguroIncendio", values.getOrDefault("seguroIncendio", 0.0));
+        requestBody.put("comisionAdministracion", values.getOrDefault("comisionAdministracion", 0.0));
+
+        // Llamar al microservicio de TotalCost mediante FeignClient
+        Map<String, Object> result = creditRequestService.calculateTotalCost(requestBody);
+
+        return ResponseEntity.ok(result);
     }
 
 
