@@ -27,14 +27,14 @@ spring:
       routes:
         # MINUTO 44:30 DE LA AYUDANTÍA 1 DE MICROSERVICIOS
         - id: ms1
-          uri: lb://ms1:8091
+          uri: lb://ms1
           predicates:
             - Path=/api/v1/creditsimulation/**
         - id: ms2
-          uri: lb://ms2:8092
+          uri: lb://ms2
           predicates:
             - Path=/api/v1/user/**
         - id: ms3
-          uri: lb://ms3:8093
+          uri: lb://ms3
           predicates:
             - Path=/api/v1/creditrequest/**
