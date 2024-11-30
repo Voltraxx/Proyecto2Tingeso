@@ -2,9 +2,9 @@ server:
   port: 8091
 spring:
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/microservicio_1
+    url: jdbc:postgresql://localhost:5433/microservicio_1
     username: postgres
-    password: ${DB_PASSWORD}
+    password: 1234
 eureka:
   instance:
     preferIpAddress: true
