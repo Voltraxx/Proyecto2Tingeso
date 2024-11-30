@@ -33,7 +33,7 @@ spring:
         - id: ms2
           uri: lb://ms2
           predicates:
-            - Path=/api/v1/user/**
+            - Path=/api/v1/users/**
         - id: ms3
           uri: lb://ms3
           predicates:
