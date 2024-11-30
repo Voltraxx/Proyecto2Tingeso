@@ -7,7 +7,7 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://localhost:8761/eureka/ # #################################### cuidado con un '/' final
 spring:
   cloud:
     gateway:
@@ -22,10 +22,10 @@ spring:
             allowedHeaders: "*"
       routes:
         # MINUTO 44:30 DE LA AYUDANTÍA 1 DE MICROSERVICIOS
-        - id: ms1 #// /////////////////////////////////////////////////////////////////////////////
-          uri: lb://ms1:8091 #// /////////////////////////////////////////////////////////////////////////////
+        - id: ms1
+          uri: lb://ms1:8091
           predicates:
-            - Path=/api/v1/creditsimulation/** #// /////////////////////////////////////////////////////////////////////////////
+            - Path=/api/v1/creditsimulation/**
         - id: ms2
           uri: lb://ms2:8092
           predicates:
