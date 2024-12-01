@@ -100,10 +100,10 @@ const AddEditUser = () => {
       alignItems="center"
       justifyContent="center"
       component="form"
+      onSubmit={saveUser}
     >
       <h3> {titleUserForm} </h3>
       <hr />
-      <form>
         <FormControl fullWidth>
           <TextField
             id="name"
@@ -279,6 +279,7 @@ const AddEditUser = () => {
         <FormControl>
           <br />
           <Button
+            type="submit"
             variant="contained"
             color="info"
             onClick={(e) => saveUser(e)}
@@ -288,7 +289,6 @@ const AddEditUser = () => {
             Guardar
           </Button>
         </FormControl>
-      </form>
       <hr />
       <Link to="/UserList/">Volver a la lista</Link>
     </Box>

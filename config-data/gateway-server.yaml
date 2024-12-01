@@ -37,4 +37,4 @@ spring:
         - id: ms3
           uri: lb://ms3
           predicates:
-            - Path=/api/v1/creditrequest/**
+            - Path=/api/v1/creditrequests/**
