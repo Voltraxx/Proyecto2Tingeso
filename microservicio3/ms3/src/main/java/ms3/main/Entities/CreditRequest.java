@@ -21,7 +21,7 @@ public class CreditRequest {
     @Column(name = "id")
     Long id;
 
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     Long userId;
 
     String type;

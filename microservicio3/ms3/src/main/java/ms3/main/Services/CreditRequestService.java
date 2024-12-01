@@ -82,6 +82,9 @@ public class CreditRequestService {
     }
 
     public CreditRequest saveCreditRequest(CreditRequest creditRequest) throws IllegalArgumentException {
+        if (creditRequest.getUserId() == null) {
+            throw new IllegalArgumentException("El ID del usuario es obligatorio.");
+        }
         validateCreditRequest(creditRequest); // Validar antes de guardar
         calculateLoanValue(creditRequest);
         return creditRequestRepository.save(creditRequest);

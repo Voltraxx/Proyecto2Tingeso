@@ -13,7 +13,7 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 const AddEditCreditRequest = () => {
-  const [user, setUser] = useState("");
+  const [userId, setUserId] = useState("");
   const [type, setType] = useState("");
   const [status, setStatus] = useState("");
   const [interest, setInterest] = useState("");
@@ -53,7 +53,7 @@ const AddEditCreditRequest = () => {
     e.preventDefault();
 
     const creditRequest = { 
-      user: { id: user },
+      userId,
       type, 
       status, 
       interest, 
@@ -104,7 +104,7 @@ const AddEditCreditRequest = () => {
       setTitleCreditRequestForm("Editar Solicitud de Crédito");
       creditRequestService.get(id)
         .then((creditRequest) => {
-          setUser(creditRequest.data.user.id);
+          setUser(creditRequest.data.userId);
           setType(creditRequest.data.type);
           setStatus(creditRequest.data.status);
           setInterest(creditRequest.data.interest);
@@ -191,8 +191,8 @@ const AddEditCreditRequest = () => {
         <TextField
           select
           label="Usuario"
-          value={user}
-          onChange={(e) => setUser(e.target.value)}
+          value={userId}
+          onChange={(e) => setUserId(e.target.value)}
           variant="standard"
           InputProps={{
             style: { color: 'white' },
