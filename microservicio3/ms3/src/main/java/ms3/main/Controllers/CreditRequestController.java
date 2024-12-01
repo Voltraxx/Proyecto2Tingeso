@@ -1,8 +1,11 @@
 package ms3.main.Controllers;
 
+import ms3.main.Clients.EvaluationFeignClient;
+import ms3.main.Clients.UserFeignClient;
 import ms3.main.Entities.CreditRequest;
 import ms3.main.Services.CreditRequestService;
 import ms3.main.Services.CreditRequestService.LoanConditions;
+import ms3.main.dtos.EvaluationDTO;
 import ms3.main.dtos.CreditRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -10,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
+import ms3.main.dtos.UserDTO;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,6 +26,12 @@ public class CreditRequestController {
 
     @Autowired
     CreditRequestService creditRequestService;
+
+    @Autowired
+    UserFeignClient userFeignClient; // Inyectar UserFeignClient
+
+    @Autowired
+    EvaluationFeignClient evaluationFeignClient;
 
     // Listar todas las solicitudes de crédito
     @GetMapping("/")
@@ -142,6 +152,30 @@ public class CreditRequestController {
         Map<String, Object> result = creditRequestService.calculateTotalCost(requestBody);
 
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/{id}/evaluate/{rule}")
+    public ResponseEntity<Boolean> evaluateCreditRequest(@PathVariable Long id, @PathVariable String rule) {
+        CreditRequest creditRequest = creditRequestService.getCreditRequestById(id);
+        if (creditRequest == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UserDTO userDTO = userFeignClient.getUserById(creditRequest.getUserId());
+        EvaluationDTO dto = new EvaluationDTO();
+        dto.setCreditRequestId(id);
+        dto.setMonthlyQuota(creditRequest.getMonthlyQuota());
+        dto.setLoanValue(creditRequest.getLoanValue());
+        dto.setTerm(creditRequest.getTerm());
+        dto.setUserIncome(userDTO.getIncome());
+        dto.setUserDebts(userDTO.getDebts());
+        dto.setUserBalance(userDTO.getBalance());
+        dto.setUserAge(userDTO.getAge());
+        dto.setUserAccountAge(userDTO.getAccountAge());
+        dto.setUserWithdrawals(userDTO.getWithdrawals());
+        dto.setUserDeposits(userDTO.getDeposits());
+
+        return ResponseEntity.ok(evaluationFeignClient.evaluateRule(dto, rule));
     }
 
 
