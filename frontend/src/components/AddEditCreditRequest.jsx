@@ -104,7 +104,7 @@ const AddEditCreditRequest = () => {
       setTitleCreditRequestForm("Editar Solicitud de Crédito");
       creditRequestService.get(id)
         .then((creditRequest) => {
-          setUser(creditRequest.data.userId);
+          setUserId(creditRequest.data.userId);
           setType(creditRequest.data.type);
           setStatus(creditRequest.data.status);
           setInterest(creditRequest.data.interest);

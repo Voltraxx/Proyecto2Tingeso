@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import creditRequestService from "../services/credit.request.service";
+import userService from "../services/user.service";
 import TextField from "@mui/material/TextField";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -21,6 +22,7 @@ import Collapse from "@mui/material/Collapse";
 
 const CreditRequestList = () => {
   const [creditRequests, setCreditRequests] = useState([]);
+  const [usersList, setUsersList] = useState([]);
   const [expandedRow, setExpandedRow] = useState(null); // Estado para la fila expandida
   const [costDetails, setCostDetails] = useState({}); // Estado para almacenar los datos de costo total
   const [formValues, setFormValues] = useState({
@@ -32,10 +34,14 @@ const CreditRequestList = () => {
   const navigate = useNavigate();
 
   const init = () => {
+    // Cargar solicitudes de crédito
     creditRequestService
       .getAll()
       .then((response) => {
-        console.log("Mostrando listado de todas las solicitudes de crédito.", response.data);
+        console.log(
+          "Mostrando listado de todas las solicitudes de crédito.",
+          response.data
+        );
         setCreditRequests(response.data);
       })
       .catch((error) => {
@@ -44,11 +50,28 @@ const CreditRequestList = () => {
           error
         );
       });
+
+    // Cargar lista de usuarios
+    userService
+      .getAll()
+      .then((response) => {
+        console.log("Usuarios cargados:", response.data);
+        setUsersList(response.data);
+      })
+      .catch((error) => {
+        console.log("Error al cargar la lista de usuarios:", error);
+      });
   };
 
   useEffect(() => {
     init();
   }, []);
+
+  // Función para obtener el nombre del usuario según el userId
+  const getUserName = (userId) => {
+    const user = usersList.find((user) => user.id === userId);
+    return user ? user.name : "Desconocido";
+  };
 
   const handleDelete = (id) => {
     const confirmDelete = window.confirm("¿Está seguro que desea borrar esta solicitud?");
@@ -181,7 +204,9 @@ const CreditRequestList = () => {
           {creditRequests.map((creditRequest) => (
             <React.Fragment key={creditRequest.id}>
               <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                <TableCell align="left">{creditRequest.user.name}</TableCell>
+                <TableCell align="left">
+                  {getUserName(creditRequest.userId)}
+                </TableCell>
                 <TableCell align="left">{creditRequest.type}</TableCell>
                 <TableCell align="left">{creditRequest.term}</TableCell>
                 <TableCell align="left">{creditRequest.interest}</TableCell>
