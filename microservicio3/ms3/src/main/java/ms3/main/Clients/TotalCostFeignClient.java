@@ -1,6 +1,7 @@
 package ms3.main.Clients;
 
 import ms3.main.Configurations.FeignClientConfig;
+import ms3.main.dtos.CreditRequestDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,6 @@ import java.util.Map;
         configuration = FeignClientConfig.class
 )
 public interface TotalCostFeignClient {
-
     @PostMapping("/calculate")
-    Map<String, Object> calculateTotalCost(@RequestBody Map<String, Object> requestBody);
+    Map<String, Object> calculateTotalCost(@RequestBody CreditRequestDTO creditRequestDTO);
 }

@@ -3,6 +3,7 @@ package ms3.main.Services;
 import ms3.main.Clients.TotalCostFeignClient;
 import ms3.main.Entities.CreditRequest;
 import ms3.main.Repositories.CreditRequestRepository;
+import ms3.main.dtos.CreditRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -185,7 +186,7 @@ public class CreditRequestService {
         }
     }
 
-    public Map<String, Object> calculateTotalCost(Map<String, Object> requestBody) {
+    public Map<String, Object> calculateTotalCost(CreditRequestDTO requestBody) {
         // Llamar al microservicio de TotalCost usando FeignClient
         return totalCostFeignClient.calculateTotalCost(requestBody);
     }

@@ -3,6 +3,7 @@ package ms3.main.Controllers;
 import ms3.main.Entities.CreditRequest;
 import ms3.main.Services.CreditRequestService;
 import ms3.main.Services.CreditRequestService.LoanConditions;
+import ms3.main.dtos.CreditRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -128,14 +129,14 @@ public class CreditRequestController {
             return ResponseEntity.notFound().build();
         }
 
-        // Preparar los datos para enviar al microservicio de TotalCost
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("loanValue", creditRequest.getLoanValue());
-        requestBody.put("monthlyQuota", creditRequest.getMonthlyQuota());
-        requestBody.put("term", creditRequest.getTerm());
-        requestBody.put("seguroDesgravamen", values.getOrDefault("seguroDesgravamen", 0.0));
-        requestBody.put("seguroIncendio", values.getOrDefault("seguroIncendio", 0.0));
-        requestBody.put("comisionAdministracion", values.getOrDefault("comisionAdministracion", 0.0));
+        // Crear el DTO para enviar al microservicio de TotalCost
+        CreditRequestDTO requestBody = new CreditRequestDTO();
+        requestBody.setLoanValue(creditRequest.getLoanValue());
+        requestBody.setMonthlyQuota(creditRequest.getMonthlyQuota());
+        requestBody.setTerm(creditRequest.getTerm());
+        requestBody.setSeguroDesgravamen(values.getOrDefault("seguroDesgravamen", 0.0));
+        requestBody.setSeguroIncendio(values.getOrDefault("seguroIncendio", 0.0));
+        requestBody.setComisionAdministracion(values.getOrDefault("comisionAdministracion", 0.0));
 
         // Llamar al microservicio de TotalCost mediante FeignClient
         Map<String, Object> result = creditRequestService.calculateTotalCost(requestBody);

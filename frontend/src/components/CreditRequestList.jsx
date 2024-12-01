@@ -89,11 +89,12 @@ const CreditRequestList = () => {
 
   const handleCalculateCost = async (id) => {
     try {
-      const response = await creditRequestService.calculateTotalCost(id, {
-        seguroDesgravamen: parseFloat(formValues.seguroDesgravamen),
-        seguroIncendio: parseFloat(formValues.seguroIncendio),
-        comisionAdministracion: parseFloat(formValues.comisionAdministracion)
-      });
+      const data = {
+        seguroDesgravamen: parseFloat(formValues.seguroDesgravamen) || 0,
+        seguroIncendio: parseFloat(formValues.seguroIncendio) || 0,
+        comisionAdministracion: parseFloat(formValues.comisionAdministracion) || 0,
+      };
+      const response = await creditRequestService.calculateTotalCost(id, data);
       setCostDetails((prevDetails) => ({
         ...prevDetails,
         [id]: response.data,
