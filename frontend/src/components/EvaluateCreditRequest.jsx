@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Link, useNavigate } from "react-router-dom";
+import userService from "../services/user.service";
 import creditRequestService from "../services/credit.request.service";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -23,18 +24,22 @@ const EvaluateCreditRequest = () => {
   });
   const [creditRequestData, setCreditRequestData] = useState(null);
   const navigate = useNavigate();
+  const [usersList, setUsersList] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await creditRequestService.get(id);
-        setCreditRequestData(response.data); // Almacena los datos de la solicitud
-        console.log("Estado actual de la solicitud:", response.data.status); // Verificar el estado
+        const [creditRequestResponse, usersResponse] = await Promise.all([
+          creditRequestService.get(id),
+          userService.getAll(),
+        ]);
+        setCreditRequestData(creditRequestResponse.data);
+        setUsersList(usersResponse.data);
       } catch (error) {
-        console.error("Error al cargar los datos de la solicitud", error);
+        console.error("Error al cargar los datos:", error);
       }
     };
-
+  
     fetchData();
   }, [id]);
 
@@ -65,16 +70,16 @@ const EvaluateCreditRequest = () => {
     }
   };
 
-  const handleAcceptReject = (rule, accepted) => {
-    setEvaluationResults((prevResults) => ({
-      ...prevResults,
-      [rule]: accepted,
-    }));
-  };
+   const handleAcceptReject = (rule, accepted) => {
+     setEvaluationResults((prevResults) => ({
+       ...prevResults,
+       [rule]: accepted,
+     }));
+   };
 
   const handleApprove = async () => {
       try {
-          await creditRequestService.updateStatus(id, "approve");
+          // await creditRequestService.updateStatus(id, "approve");
           navigate("/creditRequestList");
       } catch (error) {
           console.error("Error al aprobar la solicitud", error);
@@ -83,15 +88,39 @@ const EvaluateCreditRequest = () => {
 
   const handleReject = async () => {
       try {
-          await creditRequestService.updateStatus(id, "reject");
+          // await creditRequestService.updateStatus(id, "reject");
           navigate("/creditRequestList");
       } catch (error) {
           console.error("Error al rechazar la solicitud", error);
       }
   };
 
+  // Función para cargar la lista de usuarios
+  const fetchUsers = async () => {
+    try {
+      const response = await userService.getAll();
+      console.log("Usuarios cargados:", response.data);
+      setUsersList(response.data); // Actualiza el estado con la lista de usuarios
+    } catch (error) {
+      console.error("Error al cargar la lista de usuarios:", error);
+    }
+  };
+
+  // useEffect para cargar usuarios al montar el componente
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+   // Función para obtener un usuario por ID
+   const getUserById = (userId) => {
+    const user = usersList.find((user) => user.id === userId);
+    return user || null; // Retorna el objeto usuario completo o null si no se encuentra
+  };
+
   if (!creditRequestData) return <p>Cargando datos de la solicitud...</p>;
 
+  const CRuserId = creditRequestData.userId;
+  const CRuser = getUserById(CRuserId);
   return (
     <Box display="flex" flexDirection="column" alignItems="center">
       <h2>Evaluar Solicitud de Crédito</h2>
@@ -108,8 +137,8 @@ const EvaluateCreditRequest = () => {
       >
         <h4>Relación Cuota/Ingreso (R1)</h4>
         <p>Cuota Mensual: {creditRequestData.monthlyQuota}</p>
-        <p>Ingreso Mensual: {creditRequestData.user.income}</p>
-        <p>Relación Cuota/Ingreso: {(creditRequestData.monthlyQuota / creditRequestData.user.income).toFixed(2)}</p>
+        <p>Ingreso Mensual: {CRuser.income}</p>
+        <p>Relación Cuota/Ingreso: {(creditRequestData.monthlyQuota / CRuser.income).toFixed(2)}</p>
         <Button variant="contained" onClick={() => evaluateRule("R1")}>
           Evaluar
         </Button>
@@ -126,7 +155,7 @@ const EvaluateCreditRequest = () => {
         alignItems="center"
       >
         <h4>Historial crediticio del cliente (R2)</h4>
-        <p>Historial: {creditRequestData.user.creditHistory}</p>
+        <p>Historial: {CRuser.creditHistory}</p>
 
         <Button
           variant="contained"
@@ -166,7 +195,7 @@ const EvaluateCreditRequest = () => {
         alignItems="center"
       >
         <h4>Antigüedad laboral y estabilidad (R3)</h4>
-        <p>Tipo de Trabajador: {creditRequestData.user.job}</p>
+        <p>Tipo de Trabajador: {CRuser.job}</p>
         
         <Button
           variant="contained"
@@ -206,9 +235,9 @@ const EvaluateCreditRequest = () => {
         alignItems="center"
       >
         <h4>Relación Deuda/Ingreso (R4)</h4>
-        <p>Deudas (+cuota): {creditRequestData.user.debts + creditRequestData.monthlyQuota}</p>
-        <p>Salario Usuario: {creditRequestData.user.income}</p>
-        <p>Relación Deuda/Ingreso: {((creditRequestData.user.debts + creditRequestData.monthlyQuota)/ creditRequestData.user.income).toFixed(2)}</p>
+        <p>Deudas (+cuota): {CRuser.debts + creditRequestData.monthlyQuota}</p>
+        <p>Salario Usuario: {CRuser.income}</p>
+        <p>Relación Deuda/Ingreso: {((CRuser.debts + creditRequestData.monthlyQuota)/ CRuser.income).toFixed(2)}</p>
         <Button variant="contained" onClick={() => evaluateRule("R4")}>
           Evaluar
         </Button>
@@ -243,8 +272,8 @@ const EvaluateCreditRequest = () => {
         alignItems="center"
       >
         <h4>Edad del Solicitante (R6)</h4>
-        <p>Edad actual del solicitante: {creditRequestData.user.age}</p>
-        <p>Edad del solicitante al final del préstamo: {creditRequestData.user.age + creditRequestData.term}</p>
+        <p>Edad actual del solicitante: {CRuser.age}</p>
+        <p>Edad del solicitante al final del préstamo: {CRuser.age + creditRequestData.term}</p>
         <Button variant="contained" onClick={() => evaluateRule("R6")}>
           Evaluar
         </Button>
@@ -276,9 +305,9 @@ const EvaluateCreditRequest = () => {
         >
           <h5>Saldo Mínimo Requerido (R71)</h5>
           <p>El cliente debe tener un saldo mínimo de al menos el 10% del monto del préstamo solicitado.</p>
-          <p>Saldo de la cuenta: {creditRequestData.user.balance}</p>
+          <p>Saldo de la cuenta: {CRuser.balance}</p>
           <p>Valor del préstamo: {creditRequestData.loanValue}</p>
-          <p>Porcentaje en la cuenta de ahorro: {(creditRequestData.user.balance/creditRequestData.loanValue).toFixed(2)}%</p>
+          <p>Porcentaje en la cuenta de ahorro: {(CRuser.balance/creditRequestData.loanValue).toFixed(2)}%</p>
           
           {/* Botón Evaluar */}
           <Button variant="contained" onClick={() => evaluateRule("R71")} style={{ marginTop: "10px" }}>
@@ -300,11 +329,11 @@ const EvaluateCreditRequest = () => {
         >
           <h5>Historial de Ahorro Consistente (R72)</h5>
           <p>El cliente debe haber mantenido un saldo positivo en su cuenta de ahorros por lo menos durante los últimos 12 meses, sin realizar retiros significativos (+50% del saldo).</p>
-          <p>Saldo de la cuenta: {creditRequestData.user.balance}</p>
+          <p>Saldo de la cuenta: {CRuser.balance}</p>
           
           <p>Últimos 12 retiros (valores en bruto):</p>
           <ul>
-            {creditRequestData.user.withdrawals.slice(-12).map((withdrawal, index) => (
+            {CRuser.withdrawals.slice(-12).map((withdrawal, index) => (
               <li key={index}>{withdrawal}</li>
             ))}
           </ul>
@@ -312,9 +341,9 @@ const EvaluateCreditRequest = () => {
           {/* Lista de porcentajes de los últimos 12 retiros */}
           <p>Porcentajes de los últimos 12 retiros:</p>
           <ul>
-            {creditRequestData.user.withdrawals.slice(-12).map((withdrawal, index) => (
+            {CRuser.withdrawals.slice(-12).map((withdrawal, index) => (
               <li key={index}>
-                {((withdrawal / creditRequestData.user.balance) * 100).toFixed(2)}%
+                {((withdrawal / CRuser.balance) * 100).toFixed(2)}%
               </li>
             ))}
           </ul>
@@ -339,18 +368,18 @@ const EvaluateCreditRequest = () => {
         >
           <h5>Depósitos Periódicos (R73)</h5>
           <p>El cliente debe realizar depósitos regulares en su cuenta de ahorros o inversión. Los depósitos deben sumar al menos el 5% de sus ingresos mensuales, y no debe haber 3 o más meses consecutivos sin depósitos.</p>
-          <p>Ingreso mensual: {creditRequestData.user.income}</p>
-          <p>Monto mínimo requerido (5% del ingreso mensual): {(creditRequestData.user.income * 0.05).toFixed(2)}</p>
+          <p>Ingreso mensual: {CRuser.income}</p>
+          <p>Monto mínimo requerido (5% del ingreso mensual): {(CRuser.income * 0.05).toFixed(2)}</p>
           
           {/* Lista de valores brutos de los últimos 12 depósitos */}
           <p>Últimos 12 depósitos (valores en bruto):</p>
           <ul>
-            {creditRequestData.user.deposits.slice(-12).map((deposit, index) => (
+            {CRuser.deposits.slice(-12).map((deposit, index) => (
               <li key={index}>{deposit}</li>
             ))}
           </ul>
 
-          <p>Suma total de los depósitos: {creditRequestData.user.deposits.slice(-12).reduce((sum, deposit) => sum + deposit, 0).toFixed(2)}</p>
+          <p>Suma total de los depósitos: {CRuser.deposits.slice(-12).reduce((sum, deposit) => sum + deposit, 0).toFixed(2)}</p>
 
           {/* Botón Evaluar */}
           <Button variant="contained" onClick={() => evaluateRule("R73")} style={{ marginTop: "10px" }}>
@@ -372,10 +401,10 @@ const EvaluateCreditRequest = () => {
         >
           <h5>Relación Saldo/Años de Antigüedad (R74)</h5>
           <p>Si el cliente tiene menos de 2 años en la cuenta de ahorros, debe tener un saldo acumulado de al menos el 20% del préstamo solicitado. Si tiene 2 años o más, solo basta con el 10%</p>
-          <p>Saldo acumulado: {creditRequestData.user.balance}</p>
+          <p>Saldo acumulado: {CRuser.balance}</p>
           <p>Valor del préstamo: {creditRequestData.loanValue}</p>
-          <p>Antigüedad de la Cuenta: {creditRequestData.user.account_age}</p>
-          <p>Porcentaje de la Cuenta de Ahorro: {((creditRequestData.user.balance/creditRequestData.loanValue)*100).toFixed(2)}%</p>
+          <p>Antigüedad de la Cuenta: {CRuser.account_age}</p>
+          <p>Porcentaje de la Cuenta de Ahorro: {((CRuser.balance/creditRequestData.loanValue)*100).toFixed(2)}%</p>
           {/* Botón Evaluar */}
           <Button variant="contained" onClick={() => evaluateRule("R74")} style={{ marginTop: "10px" }}>
             Evaluar
@@ -396,12 +425,12 @@ const EvaluateCreditRequest = () => {
         >
           <h5>Retiros Recientes (R75)</h5>
           <p>Si el cliente ha realizado un retiro superior al 30% del saldo de su cuenta en los últimos 6 meses, marcar este punto como negativo, ya que indica una posible falta de estabilidad financiera.</p>
-          <p>Saldo de la cuenta: {creditRequestData.user.balance}</p>
+          <p>Saldo de la cuenta: {CRuser.balance}</p>
 
           {/* Lista de valores brutos de los últimos 6 retiros */}
           <p>Retiros de los últimos 6 meses:</p>
           <ul>
-            {creditRequestData.user.withdrawals.slice(-6).map((withdrawal, index) => (
+            {CRuser.withdrawals.slice(-6).map((withdrawal, index) => (
               <li key={index}>{withdrawal}</li>
             ))}
           </ul>
@@ -409,9 +438,9 @@ const EvaluateCreditRequest = () => {
           {/* Lista de porcentajes de los últimos 6 retiros */}
           <p>Porcentajes de los últimos 6 retiros:</p>
           <ul>
-            {creditRequestData.user.withdrawals.slice(-6).map((withdrawal, index) => (
+            {CRuser.withdrawals.slice(-6).map((withdrawal, index) => (
               <li key={index}>
-                {((withdrawal / creditRequestData.user.balance) * 100).toFixed(2)}%
+                {((withdrawal / CRuser.balance) * 100).toFixed(2)}%
               </li>
             ))}
           </ul>

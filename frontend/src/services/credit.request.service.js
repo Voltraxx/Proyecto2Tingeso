@@ -28,7 +28,7 @@ const getLoanConditions = (loanType) => {
 }
 
 const evaluateRule = (id, rule) => {
-    return httpClient.get(`/api/v1/creditrequests/${id}/evaluate/${rule}`);
+    return httpClient.post(`/api/v1/creditrequests/${id}/evaluate/${rule}`);
 }
 
 // Método para subir documentos

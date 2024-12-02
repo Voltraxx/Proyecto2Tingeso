@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 )
 public interface EvaluationFeignClient {
 
-    @PostMapping("/api/v1/creditevaluation/evaluate/{rule}")
+    @PostMapping("/evaluate/{rule}")
     Boolean evaluateRule(@RequestBody EvaluationDTO creditEvaluationDTO, @PathVariable String rule);
 }
