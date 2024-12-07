@@ -1,19 +1,18 @@
 package ms3.main.Controllers;
 
 import ms3.main.Clients.EvaluationFeignClient;
+import ms3.main.Clients.FollowUpFeignClient;
 import ms3.main.Clients.UserFeignClient;
 import ms3.main.Entities.CreditRequest;
 import ms3.main.Services.CreditRequestService;
 import ms3.main.Services.CreditRequestService.LoanConditions;
-import ms3.main.dtos.EvaluationDTO;
-import ms3.main.dtos.CreditRequestDTO;
+import ms3.main.dtos.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
-import ms3.main.dtos.UserDTO;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -32,6 +31,9 @@ public class CreditRequestController {
 
     @Autowired
     EvaluationFeignClient evaluationFeignClient;
+
+    @Autowired
+    FollowUpFeignClient followUpFeignClient;
 
     // Listar todas las solicitudes de crédito
     @GetMapping("/")
@@ -178,5 +180,25 @@ public class CreditRequestController {
         return ResponseEntity.ok(evaluationFeignClient.evaluateRule(dto, rule));
     }
 
+    @PostMapping("/{id}/status")
+    public ResponseEntity<StatusUpdateResponseDTO> updateCreditRequestStatus(@PathVariable Long id, @RequestBody CreditRequestStatusUpdateDTO dto) {
+        try {
+            // Llamar al microservicio FollowUp para calcular el nuevo estado
+            StatusUpdateResponseDTO response = followUpFeignClient.updateCreditRequestStatus(id, dto);
+
+            // Actualizar el estado en la base de datos de CreditRequest
+            CreditRequest creditRequest = creditRequestService.getCreditRequestById(id);
+            if (creditRequest == null) {
+                return ResponseEntity.notFound().build();
+            }
+            creditRequest.setStatus(response.getNewStatus());
+            creditRequestService.saveCreditRequest(creditRequest);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 
 }

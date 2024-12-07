@@ -79,7 +79,7 @@ const EvaluateCreditRequest = () => {
 
   const handleApprove = async () => {
       try {
-          // await creditRequestService.updateStatus(id, "approve");
+          await creditRequestService.updateStatus(id, "approve");
           navigate("/creditRequestList");
       } catch (error) {
           console.error("Error al aprobar la solicitud", error);
@@ -88,7 +88,7 @@ const EvaluateCreditRequest = () => {
 
   const handleReject = async () => {
       try {
-          // await creditRequestService.updateStatus(id, "reject");
+          await creditRequestService.updateStatus(id, "reject");
           navigate("/creditRequestList");
       } catch (error) {
           console.error("Error al rechazar la solicitud", error);

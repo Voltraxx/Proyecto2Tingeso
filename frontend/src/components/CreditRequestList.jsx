@@ -134,48 +134,48 @@ const CreditRequestList = () => {
 
   const handleEvaluate = async (id) => {
       try {
-          // await creditRequestService.updateStatus(id, "evaluate");
+          await creditRequestService.updateStatus(id, "evaluate");
           navigate(`/creditRequest/evaluate/${id}`);
       } catch (error) {
           console.error("Error al actualizar el estado a 'En Evaluación'", error);
       }
   };
 
-  // const handleCancel = async (id) => {
-  //     try {
-  //         await creditRequestService.updateStatus(id, "cancel");
-  //         init(); // Actualizar la lista de solicitudes para reflejar el cambio de estado
-  //     } catch (error) {
-  //         console.error("Error al actualizar el estado a 'Cancelado por el Cliente'", error);
-  //     }
-  // };
+  const handleCancel = async (id) => {
+      try {
+          await creditRequestService.updateStatus(id, "cancel");
+          init(); // Actualizar la lista de solicitudes para reflejar el cambio de estado
+      } catch (error) {
+          console.error("Error al actualizar el estado a 'Cancelado por el Cliente'", error);
+      }
+  };
 
-  // const handleApprove = async (id) => {
-  //     try {
-  //         await creditRequestService.updateStatus(id, "moveToFinalApproval");
-  //         init(); 
-  //     } catch (error) {
-  //         console.error("Error al cambiar el estado a 'Aprobación Final'", error);
-  //     }
-  // };
+  const handleApprove = async (id) => {
+     try {
+          await creditRequestService.updateStatus(id, "moveToFinalApproval");
+          init(); 
+      } catch (error) {
+          console.error("Error al cambiar el estado a 'Aprobación Final'", error);
+      }
+  };
 
-  // const handleFinalApproval = async (id) => {
-  //     try {
-  //       await creditRequestService.updateStatus(id, "finalApproval");
-  //       init();
-  //     } catch (error) {
-  //       console.error("Error al realizar la aprobación final", error);
-  //     }
-  // };
+  const handleFinalApproval = async (id) => {
+      try {
+        await creditRequestService.updateStatus(id, "finalApproval");
+        init();
+      } catch (error) {
+        console.error("Error al realizar la aprobación final", error);
+      }
+  };
 
-  // const handleDisburse = async (id) => {
-  //     try {
-  //         await creditRequestService.updateStatus(id, "disburseLoan");
-  //         init(); 
-  //     } catch (error) {
-  //         console.error("Error al cambiar el estado a 'En Desembolso'", error);
-  //     }
-  // };
+  const handleDisburse = async (id) => {
+     try {
+          await creditRequestService.updateStatus(id, "disburseLoan");
+          init(); 
+      } catch (error) {
+         console.error("Error al cambiar el estado a 'En Desembolso'", error);
+      }
+  };
 
 
   return (
@@ -246,7 +246,7 @@ const CreditRequestList = () => {
                   >
                     Evaluar
                   </Button>
-                  {/* <Button
+                  <Button
                     variant="contained"
                     color="warning"
                     size="small"
@@ -288,7 +288,7 @@ const CreditRequestList = () => {
                     >
                       Desembolsar
                     </Button>
-                  )} */}
+                  )}
                     <Button
                       variant="contained"
                       color="secondary"
