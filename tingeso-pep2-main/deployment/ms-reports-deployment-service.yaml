@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-reports-deployment
+  labels:
+    app: ms-reports-deployment
+spec:
+  selector:
+    matchLabels:
+      app: ms-reports-deployment
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ms-reports-deployment
+    spec:
+      containers:
+        - name: ms-reports
+          image: wittyz/ms-reports
+          ports:
+            - containerPort: 8093
+          env:
+            - name: SERVER_PORT
+              value: "0"

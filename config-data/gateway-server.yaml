@@ -17,9 +17,20 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: '*'
-            allowedMethods: "*"
-            allowedHeaders: "*"
+            allowedOrigins:
+              - http://172.27.38.69:31254 # Dirección del frontend
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders:
+              - Content-Type
+              - Authorization
+              - X-Requested-With
+              - Accept
+            allowCredentials: true
       routes:
         - id: ms1
           uri: lb://ms1

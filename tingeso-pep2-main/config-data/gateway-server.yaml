@@ -1,0 +1,47 @@
+server:
+  port: 8080
+eureka:
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://eureka-server-service:8761/eureka
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+        default-filters:
+          - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: '*'
+            allowedMethods: "*"
+            allowedHeaders: "*"
+      routes:
+        - id: ms-cars
+          uri: lb://ms-cars
+          predicates:
+            - Path=/car/**
+        - id: ms-cars2
+          uri: lb://ms-cars
+          predicates:
+            - Path=/bono/**
+        - id: ms-repair-prices
+          uri: lb://ms-repair-prices
+          predicates:
+            - Path=/repair_price/**
+        - id: ms-repairs
+          uri: lb://ms-repairs
+          predicates:
+            - Path=/repair/**
+        - id: ms-repairs2
+          uri: lb://ms-repairs
+          predicates:
+            - Path=/repair_detail/**
+        - id: ms-reports
+          uri: lb://ms-reports
+          predicates:
+            - Path=/report/**

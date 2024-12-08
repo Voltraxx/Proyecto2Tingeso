@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: autofix-db-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/autofix-db-data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: autofix-db-pvc
+  labels:
+    app: postgres
+    tier: database
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: autofix-db-deployment
+  labels:
+    app: autofix-db-deployment
+    tier: database
+spec:
+  selector:
+    matchLabels:
+      app: autofix-db-deployment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: autofix-db-deployment
+        tier: database
+    spec:
+      containers:
+        - name: autofix-db
+          image: postgres
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_USER_AUTOFIX
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_PASSWORD_AUTOFIX
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: autofix-db-data
+      volumes:
+        - name: autofix-db-data
+          persistentVolumeClaim:
+            claimName: autofix-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: autofix-db-service
+  labels:
+    app: autofix-db-service
+    tier: database
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: autofix-db-deployment
+    tier: database
+  type: LoadBalancer
