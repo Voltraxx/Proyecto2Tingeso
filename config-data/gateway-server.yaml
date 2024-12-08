@@ -19,6 +19,7 @@ spring:
           '[/**]':
             allowedOrigins:
               - http://172.27.38.69:31553 # Dirección correcta del frontend
+              - http://172.27.38.69:30578
             allowedMethods:
               - GET
               - POST
