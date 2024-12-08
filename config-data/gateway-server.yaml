@@ -7,23 +7,21 @@ eureka:
     fetch-registry: true
     register-with-eureka: true
     service-url:
-      defaultZone: http://localhost:8761/eureka/ # #################################### cuidado con un '/' final
+      defaultZone: http://eureka-server-service:8761/eureka/ # #################################### cuidado con un '/' final
 spring:
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+        default-filters:
+          - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins:
-              - http://localhost:5173
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-            allowedHeaders:
-              - "*"
-            allowCredentials: true
+            allowedOrigins: '*'
+            allowedMethods: "*"
+            allowedHeaders: "*"
       routes:
         # MINUTO 44:30 DE LA AYUDANTÍA 1 DE MICROSERVICIOS
         - id: ms1

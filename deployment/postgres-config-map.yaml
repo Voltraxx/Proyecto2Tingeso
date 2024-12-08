@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config-map
+  labels:
+    app: postgres-config-map
+data:
+  DB_HOST_CREDITSIMULATION: "creditsimulation-db-service"
+  DB_PORT_CREDITSIMULATION: "5432"
+  DB_DBNAME_CREDITSIMULATION: "microservicio_1"
+  DB_HOST_USER: "user-db-service"
+  DB_PORT_USER: "5433"
+  DB_DBNAME_USER: "microservicio_2"
+  DB_HOST_CREDITREQUEST: "creditrequest-db-service"
+  DB_PORT_CREDITREQUEST: "5434"
+  DB_DBNAME_CREDITREQUEST: "microservicio_3"
+  DB_HOST_EVALUATION: "evaluation-db-service"
+  DB_PORT_EVALUATION: "5435"
+  DB_DBNAME_EVALUATION: "microservicio_4"
+  DB_HOST_FOLLOWUP: "followup-db-service"
+  DB_PORT_FOLLOWUP: "5436"
+  DB_DBNAME_FOLLOWUP: "microservicio_5"
+  DB_HOST_TOTALCOST: "totalcost-db-service"
+  DB_PORT_TOTALCOST: "5437"
+  DB_DBNAME_TOTALCOST: "microservicio_6"

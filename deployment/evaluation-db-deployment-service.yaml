@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: evaluation-db-pv
+  labels:
+    type: local
+spec:
+  storageClassName: standard
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/evaluation-db-data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: evaluation-db-pvc
+  labels:
+    app: postgres
+    tier: database
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: evaluation-db-deployment
+  labels:
+    app: evaluation-db-deployment
+    tier: database
+spec:
+  selector:
+    matchLabels:
+      app: evaluation-db-deployment
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: evaluation-db-deployment
+        tier: database
+    spec:
+      containers:
+        - name: evaluation-db
+          image: postgres
+          imagePullPolicy: "IfNotPresent"
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_USER_GENERAL
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: DB_PASSWORD_GENERAL
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: evaluation-db-data
+      volumes:
+        - name: evaluation-db-data
+          persistentVolumeClaim:
+            claimName: evaluation-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: evaluation-db-service
+  labels:
+    app: evaluation-db-service
+    tier: database
+spec:
+  ports:
+    - port: 5435
+      targetPort: 5432
+      protocol: TCP
+  selector:
+    app: evaluation-db-deployment
+    tier: database
+  type: LoadBalancer
