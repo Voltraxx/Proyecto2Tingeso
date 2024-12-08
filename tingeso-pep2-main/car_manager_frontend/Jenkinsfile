@@ -1,0 +1,26 @@
+pipeline{
+    agent any
+    stages{
+        stage("Build Frontend"){
+            steps{
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/wittyZzZ/tingeso_pep1']])
+                dir("car_manager_frontend"){
+                    bat "npm install"
+                    bat "npm run build"
+                }
+            }
+        }
+        stage("Build and Push Docker Image"){
+            steps{
+                dir("car_manager_frontend"){
+                    script{
+                         withDockerRegistry(credentialsId: 'docker-credentials'){
+                            bat "docker build -t wittyz/autofix-frontend-image ."
+                            bat "docker push wittyz/autofix-frontend-image"
+                        }
+                    }                    
+                }
+            }
+        }
+    }
+}
