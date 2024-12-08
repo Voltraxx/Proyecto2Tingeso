@@ -1,11 +1,10 @@
-FROM node:16 as build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
+FROM nginx:alpine
 
-FROM nginx:stable-alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
+COPY /dist /usr/share/nginx/html
+COPY /nginx/conf.d /etc/nginx/conf.d
+
+# Expose port 3000 for the Nginx server
+EXPOSE 3000
+
+# Start Nginx when the container runs
 CMD ["nginx", "-g", "daemon off;"]
